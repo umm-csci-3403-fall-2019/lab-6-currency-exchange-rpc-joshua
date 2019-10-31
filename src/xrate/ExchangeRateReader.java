@@ -1,5 +1,9 @@
 package xrate;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.*;
 import java.net.URL;
 import java.util.Properties;
@@ -10,6 +14,7 @@ import java.util.Properties;
 public class ExchangeRateReader {
 
     private String accessKey;
+    private String bURL;
 
     /**
      * Construct an exchange rate reader using the given base URL. All requests
@@ -31,6 +36,7 @@ public class ExchangeRateReader {
          */
 
         // TODO Your code here
+        this.bURL = baseURL;
 
         // Reads the access keys from `etc/access_keys.properties`
         readAccessKeys();
@@ -83,9 +89,30 @@ public class ExchangeRateReader {
      */
     public float getExchangeRate(String currencyCode, int year, int month, int day) throws IOException {
         // TODO Your code here
+        String URL;
+        if (month < 10 && day > 10) {
+            URL = bURL + year + "-" + "0" + month + "-" + day + "?access_key=" + accessKey;
+        } else if (day < 10 && month < 10) {
+            URL = bURL + year + "-" + month + "-" + "0" + day + "?access_key=" + accessKey;
+        } else if ((month < 10) && (day < 10)) {
+            URL = bURL + year + "-" + "0" + month + "-" + "0" + day + "?access_key=" + accessKey;
+        } else {
+            URL = bURL + year + "-" + month + "-" + day + "?access_key=" + accessKey;
+        }
+        System.out.println(URL);
+
+        URL url = new URL(URL);
+        InputStream inputStream = url.openStream();
+        System.out.println(URL);
+        InputStreamReader myInput = new InputStreamReader(inputStream);
+        JsonObject myJSON = new JsonParser().parse(myInput).getAsJsonObject();
+
+
+        return myJSON.getAsJsonObject("rates").get(currencyCode).getAsFloat();
+
 
         // Remove the next line when you've implemented this method.
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
     }
 
     /**
