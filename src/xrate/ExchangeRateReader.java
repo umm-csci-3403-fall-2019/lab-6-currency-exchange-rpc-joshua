@@ -89,21 +89,21 @@ public class ExchangeRateReader {
      */
     public float getExchangeRate(String currencyCode, int year, int month, int day) throws IOException {
         // TODO Your code here
-        String URL;
-        if (month < 10 && day > 10) {
-            URL = bURL + year + "-" + "0" + month + "-" + day + "?access_key=" + accessKey;
-        } else if (day < 10 && month < 10) {
-            URL = bURL + year + "-" + month + "-" + "0" + day + "?access_key=" + accessKey;
-        } else if ((month < 10) && (day < 10)) {
-            URL = bURL + year + "-" + "0" + month + "-" + "0" + day + "?access_key=" + accessKey;
+        String urlString;
+        if (month < 10 && day >= 10) {
+            urlString = bURL + year + "-" + "0" + month + "-" + day + "?access_key=" + accessKey;
+        } else if (day < 10 && month >= 10) {
+            urlString = bURL + year + "-" + month + "-" + "0" + day + "?access_key=" + accessKey;
+        } else if (month < 10 && day < 10) {
+            urlString = bURL + year + "-" + "0" + month + "-" + "0" + day + "?access_key=" + accessKey;
         } else {
-            URL = bURL + year + "-" + month + "-" + day + "?access_key=" + accessKey;
+            urlString = bURL + year + "-" + month + "-" + day + "?access_key=" + accessKey;
         }
-        System.out.println(URL);
+        //System.out.println(URL);
 
-        URL url = new URL(URL);
+        URL url = new URL(urlString);
         InputStream inputStream = url.openStream();
-        System.out.println(URL);
+        //System.out.println(urlString);
         InputStreamReader myInput = new InputStreamReader(inputStream);
         JsonObject myJSON = new JsonParser().parse(myInput).getAsJsonObject();
 
@@ -132,12 +132,35 @@ public class ExchangeRateReader {
      * @return the desired exchange rate
      * @throws IOException if there are problems reading from the server
      */
-    public float getExchangeRate(
-            String fromCurrency, String toCurrency,
-            int year, int month, int day) throws IOException {
+    public float getExchangeRate(String fromCurrency, String toCurrency, int year, int month, int day)
+            throws IOException {
         // TODO Your code here
 
+        String urlString;
+        if (month < 10 && day >= 10) {
+            urlString = bURL + year + "-" + "0" + month + "-" + day + "?access_key=" + accessKey;
+        }
+        else if (day < 10 && month >= 10) {
+            urlString = bURL + year + "-" + month + "-" + "0" + day + "?access_key=" + accessKey;
+        }
+        else if (month < 10 && day < 10) {
+            urlString = bURL + year + "-" + "0" + month + "-" + "0" + day + "?access_key=" + accessKey;
+        }
+        else {
+            urlString = bURL + year + "-" + month + "-" + day + "?access_key=" + accessKey;
+        }
+        System.out.println(urlString);
+
+        URL url = new URL(urlString);
+        InputStream inputStream = url.openStream();
+        System.out.println(urlString);
+        InputStreamReader myInput = new InputStreamReader(inputStream);
+        JsonObject myJSON = new JsonParser().parse(myInput).getAsJsonObject();
+        float FC = myJSON.getAsJsonObject("rates").get(fromCurrency).getAsFloat();
+        float TC = myJSON.getAsJsonObject("rates").get(toCurrency).getAsFloat();
+        return FC/TC;
+
         // Remove the next line when you've implemented this method.
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
     }
 }
